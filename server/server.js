@@ -28,6 +28,10 @@ const connectDB = async () => {
 connectDB();
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("Hello from Backend !!");
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/repo', repoRoutes);
 
