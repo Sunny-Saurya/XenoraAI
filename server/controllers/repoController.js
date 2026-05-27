@@ -28,7 +28,7 @@ export const analyzeRepo = async (req, res) => {
 
     // Save to Database
     const analysis = await Analysis.create({
-      user: req.user._id,
+      user: req.auth.userId,
       repoUrl,
       repoName: repoDetails.name,
       owner,
@@ -52,7 +52,7 @@ export const analyzeRepo = async (req, res) => {
 // @access  Private
 export const getAnalysisHistory = async (req, res) => {
   try {
-    const history = await Analysis.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const history = await Analysis.find({ user: req.auth.userId }).sort({ createdAt: -1 });
     res.json(history);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch history' });
@@ -71,7 +71,7 @@ export const getAnalysisById = async (req, res) => {
     }
 
     // Ensure user owns this analysis
-    if (analysis.user.toString() !== req.user._id.toString()) {
+    if (analysis.user.toString() !== req.auth.userId.toString()) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
@@ -94,7 +94,7 @@ export const chatWithAnalysis = async (req, res) => {
     }
 
     // Ensure user owns this analysis
-    if (analysis.user.toString() !== req.user._id.toString()) {
+    if (analysis.user.toString() !== req.auth.userId.toString()) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 

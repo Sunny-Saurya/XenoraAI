@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import authRoutes from './routes/authRoutes.js';
 import repoRoutes from './routes/repoRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
@@ -32,7 +31,6 @@ app.get("/", (req, res) => {
   res.send("Hello from Backend !!");
 });
 
-app.use('/api/auth', authRoutes);
 app.use('/api/repo', repoRoutes);
 
 // Error Handler
