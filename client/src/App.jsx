@@ -1,17 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext';
+import { SignedIn, SignedOut, SignIn, SignUp } from '@clerk/clerk-react';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import RepoAnalysis from './pages/RepoAnalysis';
-
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" />;
-  return children;
-};
 
 function App() {
   return (
@@ -19,22 +10,40 @@ function App() {
       <div className="min-h-screen bg-[#050505] text-gray-100 font-sans antialiased selection:bg-[#00FF66] selection:text-black dark">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login/*" element={
+            <div className="flex items-center justify-center min-h-screen">
+              <SignIn routing="path" path="/login" signUpUrl="/register" />
+            </div>
+          } />
+          <Route path="/register/*" element={
+            <div className="flex items-center justify-center min-h-screen">
+              <SignUp routing="path" path="/register" signInUrl="/login" />
+            </div>
+          } />
           <Route 
             path="/dashboard" 
             element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
+              <>
+                <SignedIn>
+                  <Dashboard />
+                </SignedIn>
+                <SignedOut>
+                  <Navigate to="/login" />
+                </SignedOut>
+              </>
             } 
           />
           <Route 
             path="/analysis/:id" 
             element={
-              <ProtectedRoute>
-                <RepoAnalysis />
-              </ProtectedRoute>
+              <>
+                <SignedIn>
+                  <RepoAnalysis />
+                </SignedIn>
+                <SignedOut>
+                  <Navigate to="/login" />
+                </SignedOut>
+              </>
             } 
           />
         </Routes>

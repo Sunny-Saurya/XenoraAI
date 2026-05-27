@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { Terminal, Lock, BarChart3, Settings, Play } from 'lucide-react';
 
@@ -23,10 +24,17 @@ const Home = () => {
           <a href="#" className="hover:text-white transition-colors">Contact</a>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/login" className="text-sm font-medium hover:text-white transition-colors">Log in</Link>
-          <Link to="/register" className="neon-btn px-5 py-2 text-sm flex items-center gap-2">
-            Get Started
-          </Link>
+          <SignedOut>
+            <Link to="/login" className="text-sm font-medium hover:text-white transition-colors">Log in</Link>
+            <Link to="/register" className="neon-btn px-5 py-2 text-sm flex items-center gap-2">
+              Get Started
+            </Link>
+          </SignedOut>
+          <SignedIn>
+            <Link to="/dashboard" className="neon-btn px-5 py-2 text-sm flex items-center gap-2">
+              Go to Dashboard
+            </Link>
+          </SignedIn>
         </div>
       </nav>
 
@@ -66,7 +74,7 @@ const Home = () => {
           transition={{ delay: 0.3 }}
           className="flex items-center gap-4"
         >
-          <Link to="/register" className="neon-btn px-8 py-3 text-lg">
+          <Link to="/dashboard" className="neon-btn px-8 py-3 text-lg">
             Start Analyzing
           </Link>
           <a href="#" className="px-8 py-3 text-lg font-medium rounded-full border border-white/10 hover:bg-white/5 transition-colors">
