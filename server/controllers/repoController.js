@@ -98,19 +98,42 @@ export const chatWithAnalysis = async (req, res) => {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
-    // Detect if user is asking about a specific file
+    // Detect if user is asking about a specific file or DB/API
     let fileContext = "";
-    const words = message.split(/[\s,]+/);
+    const msgLower = message.toLowerCase();
     
-    // Check if any word matches a file in the tree
+    // Smart DB/API File Injection
+    const isDbApiQuery = ['database', 'db', 'schema', 'model', 'api', 'route', 'endpoint', 'controller'].some(kw => msgLower.includes(kw));
+    
+    let filesToFetch = [];
+    
+    if (isDbApiQuery) {
+      // Look for schema, models, routes
+      const relevantFiles = analysis.tree.filter(f => 
+        f.type === 'blob' && 
+        (f.path.includes('model') || f.path.includes('schema') || f.path.includes('route') || f.path.includes('controller') || f.path.includes('api'))
+      ).slice(0, 2); // Max 2 relevant architectural files to avoid massive context
+      filesToFetch.push(...relevantFiles);
+    }
+
+    // Regular specific file word match
+    const words = message.split(/[\s,]+/);
     for (const word of words) {
-      const foundFile = analysis.tree.find(f => f.path.endsWith(word) && f.type === 'blob');
-      if (foundFile) {
-        const content = await fetchFileContent(analysis.owner, analysis.repoName, foundFile.path);
-        if (content) {
-          fileContext += `Content of ${foundFile.path}:\n${content.substring(0, 3000)}\n\n`;
-          break; // Just fetch one file for now to avoid token limits
+      if (word.length > 3) {
+        const foundFile = analysis.tree.find(f => f.path.endsWith(word) && f.type === 'blob');
+        if (foundFile && !filesToFetch.find(f => f.path === foundFile.path)) {
+          filesToFetch.push(foundFile);
         }
+      }
+    }
+
+    // Limit to 3 files total to prevent token limit errors
+    filesToFetch = filesToFetch.slice(0, 3);
+
+    for (const file of filesToFetch) {
+      const content = await fetchFileContent(analysis.owner, analysis.repoName, file.path);
+      if (content) {
+        fileContext += `Content of ${file.path}:\n${content.substring(0, 2000)}\n\n`;
       }
     }
 

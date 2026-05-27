@@ -43,7 +43,7 @@ Return response ONLY in this format:
   "workflow": "How data flows through the system.",
   "setup": "Steps to run the project locally.",
   "importantFiles": ["file1: purpose", "file2: purpose"],
-  "mermaidDiagram": "graph TD;\\n  A[Frontend] -- API --\u003e B[Backend];\\n  B -- Query --\u003e C[(Database)];",
+  "mermaidDiagram": "graph TD;\\n  classDef frontend fill:#3b82f6,stroke:#1d4ed8,color:#fff;\\n  classDef backend fill:#10b981,stroke:#047857,color:#fff;\\n  classDef database fill:#f59e0b,stroke:#b45309,color:#fff;\\n  A[Frontend App]:::frontend -- REST API --> B[Backend Server]:::backend;\\n  B -- Read/Write --> C[(Database)]:::database;",
   "healthScore": {
     "overall": 85,
     "codeQuality": 80,
@@ -62,6 +62,8 @@ Return response ONLY in this format:
     "Question 3 about how to scale this specific setup."
   ]
 }
+
+CRITICAL: For 'mermaidDiagram', provide a highly detailed Mermaid.js graph architecture representation. Use 'classDef' to color nodes (e.g., frontend blue, backend green, db orange). Include subgraphs if applicable. Ensure the syntax is perfectly valid Mermaid syntax.
 `;
 
   try {
@@ -108,9 +110,10 @@ Purpose: ${analysisContext.explanation.purpose}
 Architecture: ${analysisContext.explanation.architecture}
 File Tree (partial): ${JSON.stringify(analysisContext.tree?.slice(0, 50))}
 
-${fileContext ? `FILE CONTENT BEING DISCUSSED:\n${fileContext}` : ""}
+${fileContext ? `FILE CONTENT PROVIDED FOR CONTEXT:\n${fileContext}` : ""}
 
-Answer the user's questions contextually. If the user asks about a specific file and the content is provided above, explain the "what, why, and how" of that file.
+Answer the user's questions contextually. 
+If the user asks about the database, schemas, models, or API endpoints, refer to the "FILE CONTENT PROVIDED FOR CONTEXT" if it contains relevant model or route files. Explain the "what, why, and how" of the implementation based on the code provided. Provide specific examples from the code.
 If you don't know the answer, be honest. Keep answers concise and helpful.
 `;
 
